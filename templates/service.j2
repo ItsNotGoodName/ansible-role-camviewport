@@ -1,0 +1,44 @@
+# Copied from https://github.com/cage-kiosk/cage/wiki/Starting-Cage-on-boot-with-systemd
+
+[Unit]
+Description=CamViewport on tty7
+# Make sure we are started after logins are permitted. If Plymouth is
+# used, we want to start when it is on its way out.
+After=systemd-user-sessions.service plymouth-quit-wait.service
+# Since we are part of the graphical session, make sure we are started
+# before it is complete.
+Before=graphical.target
+# On systems without virtual consoles, do not start.
+ConditionPathExists=/dev/tty0
+# D-Bus is necessary for contacting logind, which is required.
+Wants=dbus.socket systemd-logind.service
+After=dbus.socket systemd-logind.service
+# Replace any (a)getty that may have spawned, since we log in
+# automatically.
+Conflicts=getty@tty7.service
+After=getty@tty7.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/startx
+ExecStop=/usr/bin/pkill xinit
+Restart=always
+User={{ camviewport_user }}
+WorkingDirectory={{ camviewport_home }}
+# Log this user with utmp, letting it show up with commands 'w' and
+# 'who'. This is needed since we replace (a)getty.
+UtmpIdentifier=tty7
+UtmpMode=user
+# A virtual terminal is needed.
+TTYPath=/dev/tty7
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+# Fail to start if not controlling the virtual terminal.
+StandardInput=tty-fail
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=graphical.target
+Alias=display-manager.service

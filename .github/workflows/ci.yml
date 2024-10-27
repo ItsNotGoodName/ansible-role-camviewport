@@ -1,0 +1,46 @@
+# yaml-language-server: https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/github-workflow.json
+---
+name: CI
+
+on:
+  # Weekly CI job because new UniFi versions may break this role
+  schedule:
+    # “At 02:00 on Sunday.”
+    - cron: "0 2 * * 0"
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "*.md"
+      - "meta/*"
+
+jobs:
+  molecule:
+    name: Molecule
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+          - debian12
+          - ubuntu2404
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install Ansible and Molecule
+        run: pip3 install ansible molecule molecule-plugins[docker] docker
+
+      - name: Run Molecule tests
+        run: molecule test
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
+          MOLECULE_DISTRO: ${{ matrix.distro }}

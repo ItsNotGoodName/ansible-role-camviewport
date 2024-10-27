@@ -1,0 +1,80 @@
+# vim:ft=yaml.ansible
+---
+- name: Install
+  ansible.builtin.import_tasks: install.yml
+
+- name: Install packages
+  ansible.builtin.apt:
+    name: "{{ camviewport_packages }}"
+    state: present
+  become: true
+  tags: camviewport
+
+- name: Install audio packages
+  ansible.builtin.apt:
+    name: "{{ camviewport_audio_packages }}"
+    state: present
+  become: true
+  tags: camviewport
+  when: camviewport_audio_enable | bool
+
+- name: Create user
+  ansible.builtin.user:
+    name: "{{ camviewport_user }}"
+    groups: "{{ camviewport_groups }}"
+    append: true
+  become: true
+  tags: camviewport
+
+- name: Copy ~/.xinitrc
+  ansible.builtin.copy:
+    content: |
+      #!/bin/bash
+      unclutter &
+      exec {{ camviewport_command }}
+    dest: "{{ camviewport_home }}/.xinitrc"
+    owner: "{{ camviewport_user }}"
+    group: "{{ camviewport_group }}"
+    mode: "0755"
+  become: true
+  notify: restart camviewport
+  tags: camviewport
+
+- name: Template service
+  ansible.builtin.template:
+    src: service.j2
+    dest: /etc/systemd/system/camviewport.service
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: restart camviewport
+  tags: camviewport
+
+- name: Enable service
+  ansible.builtin.systemd:
+    name: camviewport
+    enabled: true
+  become: true
+  tags: camviewport
+
+- name: Set systemd default target to graphical.target
+  ansible.builtin.file:
+    src: /lib/systemd/system/graphical.target
+    dest: /etc/systemd/system/default.target
+    state: link
+  become: true
+  tags: camviewport
+
+- name: Allow startx from SSH
+  ansible.builtin.lineinfile:
+    path: /etc/X11/Xwrapper.config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - regexp: "^allowed_users="
+      line: "allowed_users=anybody"
+    - regexp: "^needs_root_rights="
+      line: "needs_root_rights=yes"
+  become: true
+  tags: camviewport

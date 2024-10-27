@@ -1,0 +1,28 @@
+# vim:ft=yaml.ansible
+---
+- name: Check if already installed
+  ansible.builtin.stat:
+    path: "{{ camviewport_path }}"
+  register: camviewport_binary_register
+  tags: camviewport
+
+- name: Get installed version
+  ansible.builtin.shell: |
+    set -o pipefail
+    {{ camviewport_binary_register.stat.path }} -v
+  args:
+    executable: /bin/bash
+  register: camviewport_version_register
+  changed_when: false
+  when: camviewport_binary_register.stat.exists
+  tags: camviewport
+
+- name: Install
+  ansible.builtin.get_url:
+    url: "{{ camviewport_url }}"
+    checksum: "{{ camviewport_checksum | default(omit) }}"
+    dest: "{{ camviewport_path }}"
+    mode: "0755"
+  become: true
+  tags: camviewport
+  when: not camviewport_binary_register.stat.exists or (camviewport_version_register.stdout | default('')) != camviewport_version

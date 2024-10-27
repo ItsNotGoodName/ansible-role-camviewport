@@ -1,0 +1,26 @@
+---
+camviewport_architectures:
+  arm64: arm64
+  armv7l: armv7
+  x86_64: x86_64
+camviewport_version: "{{ undef(hint='Specify version (e.g. nightly)') }}"
+camviewport_url: "https://github.com/ItsNotGoodName/camviewport/releases/download/{{ (camviewport_version == 'nightly') | ternary('nightly', 'v'+camviewport_version) }}/camviewport_Linux_{{ camviewport_architectures[ansible_architecture] }}"
+# camviewport_checksum:
+camviewport_path: /usr/local/bin/camviewport
+
+camviewport_packages:
+  - libmpv2
+  - unclutter
+  - xinit
+  - xserver-xorg-core
+
+camviewport_audio_enable: false
+camviewport_audio_packages:
+  - pulseaudio
+
+camviewport_user: camviewport
+camviewport_group: "{{ camviewport_user }}"
+camviewport_groups: audio,video,render
+camviewport_home: "/home/{{ camviewport_user }}"
+
+camviewport_command: camviewport

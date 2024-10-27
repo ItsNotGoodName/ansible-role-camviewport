@@ -1,0 +1,14 @@
+# vim:ft=yaml.ansible
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Collect facts about system services
+      ansible.builtin.service_facts:
+      register: services_state
+    - name: Test if camviewport is enabled and running
+      ansible.builtin.assert:
+        that:
+          - services_state.ansible_facts.services["camviewport.service"]["state"] == "running"
+          - services_state.ansible_facts.services["camviewport.service"]["status"] == "enabled"
