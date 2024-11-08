@@ -22,5 +22,6 @@ camviewport_user: camviewport
 camviewport_group: "{{ camviewport_user }}"
 camviewport_groups: audio,video,render
 camviewport_home: "/home/{{ camviewport_user }}"
+# camviewport_config:
 
 camviewport_command: camviewport

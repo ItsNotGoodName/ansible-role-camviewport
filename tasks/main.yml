@@ -26,10 +26,21 @@
   become: true
   tags: camviewport
 
+- name: Copy config
+  ansible.builtin.copy:
+    content: "{{ camviewport_config }}"
+    dest: "{{ camviewport_home }}/camviewport.ini"
+    owner: "{{ camviewport_user }}"
+    group: "{{ camviewport_group }}"
+    mode: "0600"
+  become: true
+  notify: restart camviewport
+  tags: camviewport
+  when: camviewport_config is defined
+
 - name: Copy ~/.xinitrc
   ansible.builtin.copy:
     content: |
-      #!/bin/bash
       unclutter &
       exec {{ camviewport_command }}
     dest: "{{ camviewport_home }}/.xinitrc"
