@@ -38,11 +38,23 @@
   tags: camviewport
   when: camviewport_config is defined
 
+- name: Copy layout
+  ansible.builtin.copy:
+    content: "{{ camviewport_layout }}"
+    dest: "{{ camviewport_home }}/layout.ini"
+    owner: "{{ camviewport_user }}"
+    group: "{{ camviewport_group }}"
+    mode: "0644"
+  become: true
+  notify: restart camviewport
+  tags: camviewport
+  when: camviewport_layout is defined
+
 - name: Copy ~/.xinitrc
   ansible.builtin.copy:
     content: |
       unclutter &
-      exec {{ camviewport_command }}
+      exec {{ camviewport_command }}{% if camviewport_layout is defined %} --layout {{ camviewport_home }}/layout.ini{% endif %}
     dest: "{{ camviewport_home }}/.xinitrc"
     owner: "{{ camviewport_user }}"
     group: "{{ camviewport_group }}"

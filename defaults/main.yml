@@ -25,3 +25,4 @@ camviewport_home: "/home/{{ camviewport_user }}"
 # camviewport_config:
 
 camviewport_command: camviewport
+# camviewport_layout:
