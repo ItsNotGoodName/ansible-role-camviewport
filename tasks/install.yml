@@ -24,5 +24,8 @@
     dest: "{{ camviewport_path }}"
     mode: "0755"
   become: true
-  tags: camviewport
-  when: not camviewport_binary_register.stat.exists or (camviewport_version_register.stdout | default('')) != camviewport_version
+  tags:
+    - camviewport
+    - camviewport_update
+  notify: restart camviewport
+  when: '"camviewport_update" in ansible_run_tags or not camviewport_binary_register.stat.exists or (camviewport_version_register.stdout | default("")) != camviewport_version'
