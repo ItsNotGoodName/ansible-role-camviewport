@@ -5,6 +5,7 @@ camviewport_architectures:
   x86_64: x86_64
 camviewport_version: "{{ undef(hint='Specify version (e.g. nightly)') }}"
 camviewport_url: "https://github.com/ItsNotGoodName/camviewport/releases/download/{{ (camviewport_version == 'nightly') | ternary('nightly', 'v'+camviewport_version) }}/camviewport_Linux_{{ camviewport_architectures[ansible_architecture] }}"
+camviewport_url_layouts: "https://github.com/ItsNotGoodName/camviewport/releases/download/{{ (camviewport_version == 'nightly') | ternary('nightly', 'v'+camviewport_version) }}/layouts.tar.gz"
 # camviewport_checksum:
 camviewport_path: /usr/local/bin/camviewport
 

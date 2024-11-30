@@ -1,7 +1,12 @@
 # vim:ft=yaml.ansible
 ---
-- name: Install
-  ansible.builtin.import_tasks: install.yml
+- name: Create user
+  ansible.builtin.user:
+    name: "{{ camviewport_user }}"
+    groups: "{{ camviewport_groups }}"
+    append: true
+  become: true
+  tags: camviewport
 
 - name: Install packages
   ansible.builtin.apt:
@@ -18,13 +23,8 @@
   tags: camviewport
   when: camviewport_audio_enable | bool
 
-- name: Create user
-  ansible.builtin.user:
-    name: "{{ camviewport_user }}"
-    groups: "{{ camviewport_groups }}"
-    append: true
-  become: true
-  tags: camviewport
+- name: Install
+  ansible.builtin.import_tasks: install.yml
 
 - name: Copy config
   ansible.builtin.copy:

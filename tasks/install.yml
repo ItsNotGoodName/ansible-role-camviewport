@@ -18,14 +18,26 @@
   tags: camviewport
 
 - name: Install
-  ansible.builtin.get_url:
-    url: "{{ camviewport_url }}"
-    checksum: "{{ camviewport_checksum | default(omit) }}"
-    dest: "{{ camviewport_path }}"
-    mode: "0755"
-  become: true
+  notify: restart camviewport
+  when: '"camviewport_update" in ansible_run_tags or not camviewport_binary_register.stat.exists or (camviewport_version_register.stdout | default("")) != camviewport_version'
   tags:
     - camviewport
     - camviewport_update
-  notify: restart camviewport
-  when: '"camviewport_update" in ansible_run_tags or not camviewport_binary_register.stat.exists or (camviewport_version_register.stdout | default("")) != camviewport_version'
+  block:
+    - name: Install binary
+      ansible.builtin.get_url:
+        url: "{{ camviewport_url }}"
+        checksum: "{{ camviewport_checksum | default(omit) }}"
+        dest: "{{ camviewport_path }}"
+        mode: "0755"
+      become: true
+
+    - name: Download layouts
+      ansible.builtin.unarchive:
+        src: "{{ camviewport_url_layouts }}"
+        dest: "{{ camviewport_home }}"
+        mode: "0755"
+        remote_src: true
+        owner: "{{ camviewport_user }}"
+        group: "{{ camviewport_group }}"
+      become: true
