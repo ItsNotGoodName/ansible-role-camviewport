@@ -15,14 +15,6 @@
   become: true
   tags: camviewport
 
-- name: Install audio packages
-  ansible.builtin.apt:
-    name: "{{ camviewport_audio_packages }}"
-    state: present
-  become: true
-  tags: camviewport
-  when: camviewport_audio_enable | bool
-
 - name: Install
   ansible.builtin.import_tasks: install.yml
 

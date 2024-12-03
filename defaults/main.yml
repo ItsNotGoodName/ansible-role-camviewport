@@ -16,10 +16,6 @@ camviewport_packages:
   - xserver-xorg-core
   - autorandr
 
-camviewport_audio_enable: false
-camviewport_audio_packages:
-  - pulseaudio
-
 camviewport_user: camviewport
 camviewport_group: "{{ camviewport_user }}"
 camviewport_groups: audio,video,render
