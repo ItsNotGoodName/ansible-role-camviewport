@@ -1,6 +1,6 @@
 galaxy_info:
   author: itsnotgoodname
-  description: An Ansible Role that installs and configures CamViewport on Linux.
+  description: An Ansible Role that installs and configures CamViewport Debian based systems.
   role_name: camviewport
 
   # If the issue tracker for your role is not on github, uncomment the
