@@ -9,7 +9,7 @@
 - name: Get installed version
   ansible.builtin.shell: |
     set -o pipefail
-    {{ camviewport_binary_register.stat.path }} -v
+    {{ camviewport_binary_register.stat.path }} --version
   args:
     executable: /bin/bash
   register: camviewport_version_register
