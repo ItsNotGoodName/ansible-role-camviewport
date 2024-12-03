@@ -14,6 +14,7 @@ camviewport_packages:
   - unclutter
   - xinit
   - xserver-xorg-core
+  - autorandr
 
 camviewport_audio_enable: false
 camviewport_audio_packages:

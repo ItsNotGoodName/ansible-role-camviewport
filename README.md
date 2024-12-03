@@ -26,6 +26,26 @@ N/A
     - itsnotgoodname.camviewport
 ```
 
+## Display Output
+
+Get list of display outputs.
+
+```sh
+sudo su camviewport -c 'DISPLAY=:0 xrandr'
+```
+
+Set display output, resolution, and fps.
+
+```sh
+sudo su camviewport -c 'DISPLAY=:0 xrandr --auto -s 1920x1080 -r 60'
+```
+
+Save the current display output as the default.
+
+```sh
+sudo su camviewport -c 'DISPLAY=:0 autorandr --save default --force'
+```
+
 ## License
 
 MIT
