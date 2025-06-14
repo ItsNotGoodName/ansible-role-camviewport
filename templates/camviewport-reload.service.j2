@@ -1,0 +1,8 @@
+[Unit]
+Description=Reload camviewport
+
+[Service]
+ExecStart={{ camviewport_home }}/reload.sh
+User={{ camviewport_user }}
+Group={{ camviewport_group }}
+Type=oneshot

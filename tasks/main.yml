@@ -30,6 +30,22 @@
   tags: camviewport
   when: camviewport_config is defined
 
+- name: Copy config [extra]
+  ansible.builtin.copy:
+    content: "{{ item.config }}"
+    label: "{{ index }}"
+    dest: "{{ camviewport_home }}/camviewport.{{ index + 1 }}.ini"
+    owner: "{{ camviewport_user }}"
+    group: "{{ camviewport_group }}"
+    mode: "0600"
+  become: true
+  notify: restart camviewport
+  tags: camviewport
+  loop: "{{ camviewport_extra_screens }}"
+  loop_control:
+    label: "{{ index + 1 }}"
+    index_var: index
+
 - name: Copy layout
   ansible.builtin.copy:
     content: "{{ camviewport_layout }}"
@@ -42,44 +58,48 @@
   tags: camviewport
   when: camviewport_layout is defined
 
-- name: Copy ~/.xinitrc
+- name: Copy layout [extra]
   ansible.builtin.copy:
-    content: |
-      unclutter &
-      exec {{ camviewport_command }}{% if camviewport_layout is defined %} --layout {{ camviewport_home }}/layout.ini{% endif %}
-    dest: "{{ camviewport_home }}/.xinitrc"
+    content: "{{ item.layout }}"
+    dest: "{{ camviewport_home }}/layout.{{ index + 1 }}.ini"
+    owner: "{{ camviewport_user }}"
+    group: "{{ camviewport_group }}"
+    mode: "0644"
+  become: true
+  notify: restart camviewport
+  tags: camviewport
+  when: item.layout is defined
+  loop: "{{ camviewport_extra_screens }}"
+  loop_control:
+    label: "{{ index + 1 }}"
+    index_var: index
+
+- name: Template reload.sh
+  ansible.builtin.template:
+    src: reload.sh.j2
+    dest: "{{ camviewport_home }}/reload.sh"
     owner: "{{ camviewport_user }}"
     group: "{{ camviewport_group }}"
     mode: "0755"
   become: true
-  notify: restart camviewport
   tags: camviewport
 
-- name: Template service
+- name: Template ~/.xinitrc
   ansible.builtin.template:
-    src: service.j2
-    dest: /etc/systemd/system/camviewport.service
-    owner: root
-    group: root
+    src: xinitrc.j2
+    dest: "{{ camviewport_home }}/.xinitrc"
+    owner: "{{ camviewport_user }}"
+    group: "{{ camviewport_group }}"
     mode: "0644"
   become: true
   notify: restart camviewport
   tags: camviewport
 
-- name: Enable service
-  ansible.builtin.systemd:
-    name: camviewport
-    enabled: true
-  become: true
-  tags: camviewport
+- name: Xorg
+  ansible.builtin.import_tasks: xorg.yml
 
-- name: Set systemd default target to graphical.target
-  ansible.builtin.file:
-    src: /lib/systemd/system/graphical.target
-    dest: /etc/systemd/system/default.target
-    state: link
-  become: true
-  tags: camviewport
+- name: Services
+  ansible.builtin.import_tasks: services.yml
 
 - name: Allow startx from SSH
   ansible.builtin.lineinfile:

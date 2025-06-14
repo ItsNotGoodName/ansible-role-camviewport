@@ -1,0 +1,6 @@
+unclutter &
+{% for screen in camviewport_extra_screens %}
+DISPLAY=:0.{{ loop.index }} {{ camviewport_command }}{% if screen.layout is defined %} --layout {{ camviewport_home }}/layout.{{ loop.index }}.ini{% endif %} \
+  --config {{ camviewport_home }}/camviewport.{{ loop.index }}.ini &
+{% endfor %}
+DISPLAY=:0.0 exec {{ camviewport_command }}{% if camviewport_layout is defined %} --layout {{ camviewport_home }}/layout.ini{% endif %}

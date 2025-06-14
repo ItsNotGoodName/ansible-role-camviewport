@@ -1,4 +1,8 @@
 ---
+# camviewport_checksum:
+# camviewport_layout:
+# camviewport_config:
+
 camviewport_architectures:
   arm64: arm64
   armv7l: armv7
@@ -6,7 +10,6 @@ camviewport_architectures:
 camviewport_version: "{{ undef(hint='Specify version (e.g. nightly)') }}"
 camviewport_url: "https://github.com/ItsNotGoodName/camviewport/releases/download/{{ (camviewport_version == 'nightly') | ternary('nightly', 'v'+camviewport_version) }}/camviewport_Linux_{{ camviewport_architectures[ansible_architecture] }}"
 camviewport_url_layouts: "https://github.com/ItsNotGoodName/camviewport/releases/download/{{ (camviewport_version == 'nightly') | ternary('nightly', 'v'+camviewport_version) }}/layouts.tar.gz"
-# camviewport_checksum:
 camviewport_path: /usr/local/bin/camviewport
 
 camviewport_packages:
@@ -14,13 +17,18 @@ camviewport_packages:
   - unclutter
   - xinit
   - xserver-xorg-core
-  - autorandr
+  - x11-xserver-utils
 
 camviewport_user: camviewport
 camviewport_group: "{{ camviewport_user }}"
 camviewport_groups: audio,video,render
 camviewport_home: "/home/{{ camviewport_user }}"
-# camviewport_config:
-
 camviewport_command: camviewport
-# camviewport_layout:
+
+camviewport_extra_screens: []
+
+camviewport_xorg_configure: false
+camviewport_xorg_driver: ""
+camviewport_xorg_output: ""
+
+camviewport_udev_rules_dir: /usr/lib/udev/rules.d

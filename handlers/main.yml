@@ -1,7 +1,19 @@
+# vim:ft=yaml.ansible
 ---
 - name: restart camviewport
   ansible.builtin.systemd:
+    name: camviewport
     state: restarted
     daemon_reload: true
-    name: camviewport
+  become: true
+
+- name: reload camviewport-reload
+  ansible.builtin.systemd:
+    name: camviewport-reload
+    daemon_reload: true
+  become: true
+
+- name: reload udev rules
+  ansible.builtin.command: udevadm control --reload-rules
+  changed_when: true
   become: true

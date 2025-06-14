@@ -1,0 +1,38 @@
+Section "Extensions"
+  Option "DPMS" "false"
+EndSection
+
+Section "Device"
+  Identifier      "device0"
+  Driver          "{{ camviewport_xorg_driver }}"
+  Option          "ZaphodHeads" "{{ camviewport_output }}"
+  Screen          0
+EndSection
+
+Section "Screen"
+  Identifier      "screen0"
+  Device          "device0"
+EndSection
+
+{% for screen in camviewport_extra_screens %}
+Section "Device"
+  Identifier      "device{{ loop.index }}"
+  Driver          "{{ camviewport_xorg_driver }}" 
+  Option          "ZaphodHeads" "{{ screen.output }}"
+  Screen          {{ loop.index }} 
+EndSection
+
+Section "Screen"
+  Identifier      "screen{{ loop.index }}"
+  Device          "device{{ loop.index }}"
+EndSection
+{% endfor %}
+
+Section "ServerLayout"
+  Identifier      "default"
+  Option          "BlankTime" "0"
+  Screen          "screen0" 0 0
+{% for screen in camviewport_extra_screens %}
+  Screen          "screen{{ loop.index }}" RightOf "screen{{ loop.index - 1 }}"
+{% endfor %}
+EndSection

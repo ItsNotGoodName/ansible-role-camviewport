@@ -1,0 +1,49 @@
+# vim:ft=yaml.ansible
+---
+- name: Template service
+  ansible.builtin.template:
+    src: camviewport.service.j2
+    dest: /etc/systemd/system/camviewport.service
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: restart camviewport
+  tags: camviewport
+
+- name: Enable service
+  ansible.builtin.systemd:
+    name: camviewport
+    enabled: true
+  become: true
+  tags: camviewport
+
+- name: Template reload service
+  ansible.builtin.template:
+    src: camviewport-reload.service.j2
+    dest: /etc/systemd/system/camviewport-reload.service
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: reload camviewport-reload
+  tags: camviewport
+
+- name: Template udev rules
+  ansible.builtin.template:
+    src: rules.j2
+    dest: "{{ camviewport_udev_rules_dir }}/40-camviewport.rules"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: reload udev rules
+  tags: camviewport
+
+- name: Set systemd default target to graphical.target
+  ansible.builtin.file:
+    src: /lib/systemd/system/graphical.target
+    dest: /etc/systemd/system/default.target
+    state: link
+  become: true
+  tags: camviewport

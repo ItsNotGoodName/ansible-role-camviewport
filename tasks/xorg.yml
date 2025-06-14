@@ -1,0 +1,20 @@
+# vim:ft=yaml.ansible
+---
+- name: Template xorg config
+  ansible.builtin.template:
+    src: xorg.j2
+    dest: "/usr/share/X11/xorg.conf.d/100-camviewport.conf"
+    mode: "0644"
+  become: true
+  notify: restart camviewport
+  when: camviewport_xorg_configure
+  tags: camviewport
+
+- name: Remove xorg config
+  ansible.builtin.file:
+    dest: "/usr/share/X11/xorg.conf.d/100-camviewport.conf"
+    state: absent
+  become: true
+  notify: restart camviewport
+  when: not camviewport_xorg_configure
+  tags: camviewport
